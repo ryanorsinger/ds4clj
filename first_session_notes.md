@@ -1,4 +1,5 @@
 # DS4CLJ Meeting Notes
+2020-09-06
 
 ## Our R Textbook
 - [R for Data Science](https://r4ds.had.co.nz/)
@@ -24,7 +25,7 @@ Hadley Wickham and publishers have given permission to Daniel (or the SciCloj gr
 - Lists can have heterogenous types, different data types like list(2, "bob", TRUE, "Bob"). Lists are NOT atomic vectors
 - Since atomic vectors are all the same type, then there's a heigharchy of type conversion
     - `c(1, "bob")` produces the vector "1" "bob"
-    - `c(TRUE, "Janet")
+    - `c(TRUE, "Janet")`
 - Dataframes are our data structure for tabular data, Try this: `data.frame(x=c(1, 3, 5), y=c(T, F, T))`
 - Variable assignment `x <- 5` or `df = data.frame(x=c(1, 3, 5), y=c(T, F, T))`
 - Dataframe access syntax:
@@ -37,6 +38,7 @@ Hadley Wickham and publishers have given permission to Daniel (or the SciCloj gr
 - Consider `5 %>% f %> g` to read/evaluate function pipelines from left to right.
 - `attributes(df)` tells us about that object's attributes
 - How to see documentation for a function, type `?functioname`, like `?c` or `?print` or `?abs`, for example.
+- `ifelse(test, yes, no)`
 
 ## Visuals
 - Run`data(mpg)` to load up a starter dataframe
@@ -83,7 +85,48 @@ mpg %>%
 
 ## Comparing with Clojure
 - Clojure core does not natively provide "everything is a vector", but there is the library called `dtype-next` that implements/offers arrays/buffers that work like these R vectors.
-- Tablecloth
+- [Tablecloth](https://github.com/scicloj/tablecloth) is a recommended Clojure dataframe library
+
+
+## Creating a dataset
+- Tibble creates a dataframe (with tidyverse help). Why not use default dataframe? The tidyverse adds a level of additional consistency and complexity handling.
+```
+df1 <- tibble(
+    w = rep(
+      c("A", "B", "C", "A", "A", "B"),
+      10),
+    x = 1:60,
+    z = rnorm(60)) %>%
+  mutate(
+    y = ifelse(
+      w == "A",
+      x + z + 1,
+      x + z + 19
+    )
+  )
+```
+
+Could we make a plot or a statistical model for this?
+```
+df1 %>% 
+  ggplot(aes(x=x, y=y, color=w)) +
+  geom_point()
+```
+
+We could ask for a linear model
+- To make a linear model, use `lm(formula, data, subset, weights, and other arguments)`
+
+"Model y by x" is the formula
+```
+model <- lm(y ~ x, data=df1)
+print(model)
+```
+
+but what about adding `w` into the model
+```
+model_with_w <- lm(y ~ x + w, data=df1)
+print(model_with_w)
+```
 
 ## Thanks
 - Thanks to everyone who could join today!
